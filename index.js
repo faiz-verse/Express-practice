@@ -4,6 +4,8 @@ let users = [];
 const fs = require('fs'); // for file operations
 const path = require('path'); // for path operations
 
+const PORT = process.env.PORT || 3000;
+
 // ✅ Middleware to parse URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
 // ✅ Middleware to take body content as a json for every req and res
@@ -138,6 +140,6 @@ app.put("/api/users/edit/:id", (req, res) => {
     }
 })
 
-app.listen(3000, ()=>{
-    console.log("Server listening on port 3000")
+app.listen(PORT, ()=>{
+    console.log("Server listening on port: ", PORT)
 })
