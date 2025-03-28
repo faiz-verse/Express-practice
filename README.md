@@ -1,4 +1,9 @@
-# Express-practice
-This repo contains the practice I did to learn express.js
+# Express Practice  
 
-<b>Link to visit:</b> 🔗 https://express-practice-1-im6m.onrender.com
+This repository contains my **Express.js practice projects**, where I experimented with building server-side applications and APIs.  
+
+## 🔗 Live Demo  
+Check it out here:  
+➡ **https://express-practice-1-im6m.onrender.com**  
+
+Feel free to explore and share your feedback! 🚀  
