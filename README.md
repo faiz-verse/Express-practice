@@ -1,4 +1,4 @@
 # Express-practice
-This repo contains the practice I did to learn express.js and API routing
+This repo contains the practice I did to learn express.js
 
-# Link to visit: 🔗 https://express-practice-1-im6m.onrender.com
+<b>Link to visit:</b> 🔗 https://express-practice-1-im6m.onrender.com
