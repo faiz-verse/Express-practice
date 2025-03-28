@@ -1,0 +1,159 @@
+body{
+    margin: 0;
+    padding: 30px;
+    width: 100vw;
+    height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-y: scroll;
+
+    user-select: none;
+}
+
+#form-wrapper{
+    width: 350px;
+    height: 450px;
+
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 20px;
+
+    position: fixed;
+    bottom: 70px;
+    right: 50px;
+    z-index: 10;
+}
+
+#add-user{
+    width: 75px;
+    height: 75px;
+    font-size: 60px;
+    background: beige;
+    
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    border: 2px solid black;
+    
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+
+    cursor: pointer;
+    transition: scale 0.15s ease-in-out;
+    transition: transform 0.3s ease-in-out;
+}
+
+#add-user:active{
+    scale: 0.98;
+}
+
+#add-user-form{
+    width: 300px;
+    height: 280px;
+    padding: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    background: beige;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    
+    border: 2px solid black;
+
+    position: absolute;
+    top: 0px;
+    right: -200%;
+
+    transition: all 0.5s ease-in-out;
+}
+
+#users{
+    width: 95vw;
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.user{
+    font-size: 14px;
+    font-weight: 600;
+    border: 2px solid black;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    position: relative;
+}
+
+.edit-delete-buttons{
+    display: flex;
+    gap: 10px;
+    position: absolute;
+    bottom: 3px;
+    right: 5px;
+}
+
+.edit{
+    color: cornflowerblue;
+    cursor: pointer;
+    transition: scale 0.15s ease-in-out;
+}
+
+.delete{
+    color: tomato;
+    cursor: pointer;
+    transition: scale 0.15s ease-in-out;
+}
+
+.edit:active, .delete:active{
+    scale: 0.95;
+}
+
+#search-area{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#search-input{
+    all: unset;
+    width: 300px;
+    height: 20px;
+    font-size: 16px;
+    border: 2px solid black;
+    padding: 5px;
+}
+
+#search-filter{
+    height: 34px;
+    font-size: 16px;
+    border: 2px solid black;
+    padding: 5px;
+}
+
+#edit-user-form{
+    width: 300px;
+    height: 280px;
+    padding: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    background: beige;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    
+    border: 2px solid black;
+
+    position: fixed;
+    bottom: 175px;
+    right: -200%;
+    z-index: 10;
+
+    transition: all 0.5s ease-in-out;
+}

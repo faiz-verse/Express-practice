@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Portal</title>
+    <link rel="stylesheet" href="/index.css">
+</head>
+
+<body>
+
+    <div id="search-area">
+        <input type="text" id="search-input" placeholder="search by id">
+        <!-- <button id="search-button">Search</button> -->
+        <select name="search-filter" id="search-filter">
+            <option value="id">id</option>
+            <option value="first_name">first name</option>
+            <option value="last_name">last name</option>
+            <option value="email">email</option>
+            <option value="gender">gender</option>
+        </select>
+    </div>
+    
+    <h1>This is the User Portal 🧑</h1>
+
+    <div id="form-wrapper">
+        <div id="add-user">+</div>
+        <form action="http://localhost:3000/api/users/add" id="add-user-form" method="post">
+            Enter user first name: <input type="text" name="first_name">
+            Enter user last name: <input type="text" name="last_name">
+            Enter user email: <input type="email" name="email">
+            <div id="radio-options">Choose gender: <input type="radio" name="gender" id="male" value="Male"> Male <input
+                    type="radio" name="gender" id="female" value="Female"> Female </div>
+            <button type="submit">Add</button>
+        </form>
+    </div>
+
+    <form action="http://localhost:3000/api/users/edit" id="edit-user-form" method="post">
+        Enter user first name: <input type="text" name="first_name">
+        Enter user last name: <input type="text" name="last_name">
+        Enter user email: <input type="email" name="email">
+        <div id="radio-options">Choose gender: <input type="radio" name="gender" id="edit-male" value="Male"> Male
+            <input type="radio" name="gender" id="edit-female" value="Female"> Female </div>
+        <button type="submit">Update</button>
+    </form>
+
+    <!-- to contain users -->
+    <div id="results"></div>
+
+    <script>
+
+        const API_BASE_URL = "http://localhost:3000";
+
+        const results = document.getElementById('results');
+
+        // ✅ getting users on page load
+        const loadUsers = () => {
+
+            fetch(`${API_BASE_URL}/api/users/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then((response) => {
+                if (response.status === 200) {
+                    console.log(`Server responded with status code: ${response.status}`)
+                    console.log("Successfully got the users!")
+                }
+                return response.json()
+            }).then((users) => {
+                const html = `<div id="users">
+                        ${users.map(user => `<div class="user">
+                                <div class="user-id">Id: ${user.id}</div>
+                                <div class="user-name">Name: ${user.first_name + " " + user.last_name}</div>
+                                <div class="user-email">Email: ${user.email}</div>
+                                <div class="user-gender">Gender: ${user.gender}</div>
+                                <div class="edit-delete-buttons">
+                                    <div class="edit"> Edit 🖊 </div>
+                                    <div class="delete"> Delete 🗑 </div>
+                                </div>
+                            </div>`).join(" ")}</div>`
+                results.innerHTML = html
+                attachEditListeners(); // to add edit buttons event listeners
+                attachDeleteListeners(); // to add delete buttons event listeners
+            })
+        }
+
+        loadUsers() // initializing results
+
+        // ✅ Making the form interactive
+        const formWrapper = document.getElementById('form-wrapper');
+        const addUser = document.getElementById('add-user');
+        const addUserForm = document.getElementById('add-user-form');
+        let isFormActive = false;
+        addUser.addEventListener('click', () => {
+            if (isFormActive) {
+                addUserForm.style.right = `-200%`;
+                addUser.style.transform = `rotate(0deg)`;
+                addUser.style.pointerEvents = 'none';
+                addUser.style.background = 'rgb(220, 220, 200)';
+                setTimeout(() => {
+                    formWrapper.style.height = '0px';
+                    addUser.style.pointerEvents = 'auto';
+                    addUser.style.background = 'beige';
+                }, 500)
+                isFormActive = !isFormActive
+            }
+            else {
+                formWrapper.style.height = '450px';
+                addUserForm.style.right = `0%`;
+                addUser.style.transform = `rotate(-45deg)`;
+                addUser.style.pointerEvents = 'none';
+                addUser.style.background = 'rgb(220, 220, 200)';
+                setTimeout(() => {
+                    addUser.style.pointerEvents = 'auto';
+                    addUser.style.background = 'beige';
+                }, 500)
+                isFormActive = !isFormActive
+            }
+        });
+
+        // ✅ Making the form submit to add users rather than redirecting to the route
+        addUserForm.addEventListener('submit', async (event) => {
+            event.preventDefault() // ⛔ Prevent default form submission (page reload)
+
+            const formData = new FormData(event.target) // Getting the form data
+            const formObject = Object.fromEntries(formData.entries()); // Convert to JSON object
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/users/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formObject), // sending the formData as an json object
+                })
+
+                const data = await response.json() // wait to get server response
+                if (response.ok && data.success) {
+                    console.log("✅ Success:", data.message);
+                    addUserForm.style.right = `-200%`;
+                    addUser.style.transform = `rotate(0deg)`;
+                    addUser.style.pointerEvents = 'none';
+                    addUser.style.background = 'rgb(220, 220, 200)';
+                    setTimeout(() => {
+                        formWrapper.style.height = '0px';
+                        addUser.style.pointerEvents = 'auto';
+                        addUser.style.background = 'beige';
+                    }, 500)
+                    isFormActive = !isFormActive
+                    
+                    const users = data.users
+                    const html = `<div id="users">
+                            ${users.map(user => `
+                                <div class="user">
+                                    <div class="user-id">Id: ${user.id}</div>
+                                    <div class="user-name">Name: ${user.first_name} ${user.last_name}</div>
+                                    <div class="user-email">Email: ${user.email}</div>
+                                    <div class="user-gender">Gender: ${user.gender}</div>
+                                    <div class="edit-delete-buttons">
+                                        <div class="edit"> Edit 🖊 </div>
+                                        <div class="delete"> Delete 🗑 </div>
+                                    </div>
+                                </div>`).join("")}
+                        </div>`;
+                        results.innerHTML = html;
+                    attachEditListeners(); // to add edit buttons event listeners
+                    attachDeleteListeners(); // to add delete buttons event listeners
+
+                } else {
+                    console.error("❌ Error:", data.message);
+                    addUserForm.style.right = `-200%`;
+                    addUser.style.transform = `rotate(0deg)`;
+                    addUser.style.pointerEvents = 'none';
+                    addUser.style.background = 'rgb(220, 220, 200)';
+                    setTimeout(() => {
+                        formWrapper.style.height = '0px';
+                    }, 1500)
+                    setTimeout(() => {
+                        addUser.style.pointerEvents = 'auto';
+                        addUser.style.background = 'beige';
+                    }, 500)
+
+                    isFormActive = !isFormActive
+                    alert(`❌ Error: ${data.message}`)
+                }
+            } catch (error) {
+                console.error('Error adding user:', error);
+            }
+        })
+
+        // ✅ changing the placeholder based on the dropdown
+        const searchDropdown = document.getElementById('search-filter')
+        searchDropdown.addEventListener('change', (event) => {
+            console.log(event.target.value)
+            searchInput.placeholder = `search by ${event.target.value}`
+        })
+
+        // ✅ Implementing search through selected dropdown
+        const searchInput = document.getElementById('search-input');
+        // const searchButton = document.getElementById('search-button');
+        searchInput.addEventListener('input', async () => {
+            const searchKey = searchDropdown.value; // Get selected filter (id, first_name, etc.)
+            const searchValue = searchInput.value.trim(); // Get user input
+
+            if (searchValue === "") {
+                loadUsers();
+                return;
+            }
+
+            // Construct URL with dynamic query parameters
+            const url = `${API_BASE_URL}/api/users/search?${searchKey}=${encodeURIComponent(searchValue)}`;
+
+            const response = await fetch(`${url}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+
+            const data = await response.json()
+
+            if (data.success) {
+                console.log("✅ Success:", data.message);
+                const searchUser = data.users;
+                // ✅ Generate HTML for matching users
+                const html = `<div id="users">
+                            ${searchUser.map(user => `
+                                <div class="user">
+                                    <div class="user-id">Id: ${user.id}</div>
+                                    <div class="user-name">Name: ${user.first_name} ${user.last_name}</div>
+                                    <div class="user-email">Email: ${user.email}</div>
+                                    <div class="user-gender">Gender: ${user.gender}</div>
+                                    <div class="edit-delete-buttons">
+                                        <div class="edit"> Edit 🖊 </div>
+                                        <div class="delete"> Delete 🗑 </div>
+                                    </div>
+                                </div>`).join("")}
+                        </div>`;
+                results.innerHTML = html;
+                attachEditListeners(); // to add edit buttons event listeners
+                attachDeleteListeners(); // to add delete buttons event listeners
+            } else {
+                console.error("❌ Error:", data.message);
+                results.innerHTML = `<h2>${data.message}</h2>`
+            }
+
+        })
+
+
+        // ✅ Implementing Edit Feature!
+        // function to call after the users are loaded as normally eventlisteners are added when the page is first loaded
+        let isEditFormActive = false
+        const editUserForm = document.getElementById('edit-user-form');
+        let userIDBeingEdited;
+        const attachEditListeners = () => {
+            const editButtons = document.querySelectorAll('.edit');
+            editButtons.forEach((editButton, index) => {
+                editButton.addEventListener('click', async () => {
+                    // for form display & interactivity
+                    if (isEditFormActive) {
+                        editUserForm.style.right = `-200%`;
+                        addUser.style.transform = `rotate(0deg)`;
+                        addUser.style.pointerEvents = 'auto';
+                        addUser.style.background = 'beige';
+                        isEditFormActive = !isEditFormActive
+                    }
+                    else {
+                        editUserForm.style.right = `50px`;
+                        addUser.style.transform = `rotate(-45deg)`;
+                        addUser.style.pointerEvents = 'none';
+                        addUser.style.background = 'rgb(220, 220, 200)';
+                        isEditFormActive = !isEditFormActive
+                    }
+
+                    // 🔥 Find the closest `.user` container
+                    const userDiv = editButton.closest(".user");
+
+                    // 🔥 Extract ID from the `.user-id` paragraph
+                    const userIdText = userDiv.querySelector(".user-id").innerText;
+
+                    // 🔥 Extract just the number (e.g., "ID: 101" → "101")
+                    userIDBeingEdited = userIdText.replace("Id: ", "").trim();
+
+                    console.log("Editing user with ID:", userIDBeingEdited);
+
+                    const response1 = await fetch(`${API_BASE_URL}/api/users/edit/${userIDBeingEdited}`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+
+                    const data1 = await response1.json()
+                    if (data1.success) {
+                        console.log(data1.message)
+                        console.log(data1.user)
+                        // ✅ Set form input values from user data
+                        editUserForm.elements['first_name'].value = data1.user.first_name;
+                        editUserForm.elements['last_name'].value = data1.user.last_name;
+                        editUserForm.elements['email'].value = data1.user.email;
+                        // ✅ Check the correct gender radio button
+                        document.getElementById(`edit-${data1.user.gender.toLowerCase()}`).checked = true;
+                    }
+                })
+            })
+        }
+        // ✅ Making the form submit to edit users rather than redirecting to the route
+        editUserForm.addEventListener('submit', async (event) => {
+            event.preventDefault() // ⛔ Prevent default form submission (page reload)
+
+            const formData = new FormData(event.target) // Getting the form data
+            const formObject = Object.fromEntries(formData.entries()); // Convert to JSON object
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/users/edit/${userIDBeingEdited}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formObject), // sending the formData as an json object
+                })
+
+                const data = await response.json() // wait to get server response
+                if (response.ok && data.success) {
+                    console.log("✅ Success:", data.message);
+
+                    const html = `<div id="users">
+                            ${data.users.map(user => `
+                                <div class="user">
+                                    <div class="user-id">Id: ${user.id}</div>
+                                    <div class="user-name">Name: ${user.first_name} ${user.last_name}</div>
+                                    <div class="user-email">Email: ${user.email}</div>
+                                    <div class="user-gender">Gender: ${user.gender}</div>
+                                    <div class="edit-delete-buttons">
+                                        <div class="edit"> Edit 🖊 </div>
+                                        <div class="delete"> Delete 🗑 </div>
+                                    </div>
+                                </div>`).join("")}
+                        </div>`;
+                        results.innerHTML = html;
+                    attachEditListeners(); // to add edit buttons event listeners
+                    attachDeleteListeners(); // to add delete buttons event listeners
+
+                    editUserForm.style.right = `-200%`;
+                    addUser.style.transform = `rotate(0deg)`;
+                    addUser.style.pointerEvents = 'auto';
+                    addUser.style.background = 'beige';
+                    isEditFormActive = !isEditFormActive
+                } else {
+                    console.error("❌ Error:", data.message);
+                    editUserForm.style.right = `-200%`;
+                    addUser.style.transform = `rotate(0deg)`;
+                    addUser.style.pointerEvents = 'auto';
+                    addUser.style.background = 'beige';
+                    isEditFormActive = !isEditFormActive
+                    alert(`❌ Error: ${data.message}`)
+                }
+            } catch (error) {
+                console.error('Error adding user:', error);
+            }
+        })
+
+
+
+        // ✅ Implementing Delete Feature!
+        // function to call after the users are loaded as normally eventlisteners are added when the page is first loaded
+        const attachDeleteListeners = () => {
+            const deleteButtons = document.querySelectorAll('.delete');
+            deleteButtons.forEach((deleteButton, index) => {
+                deleteButton.addEventListener('click', async () => {
+                    console.log("Trying to delete user with ID: ", index + 1)
+                    const response = await fetch(`${API_BASE_URL}/api/users/delete/${index + 1}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    const data = await response.json();
+                    if (data.success) {
+                        console.log(data.message)
+                        const html = `<div id="users">
+                            ${data.users.map(user => `
+                                <div class="user">
+                                    <div class="user-id">Id: ${user.id}</div>
+                                    <div class="user-name">Name: ${user.first_name} ${user.last_name}</div>
+                                    <div class="user-email">Email: ${user.email}</div>
+                                    <div class="user-gender">Gender: ${user.gender}</div>
+                                    <div class="edit-delete-buttons">
+                                        <div class="edit"> Edit 🖊 </div>
+                                        <div class="delete"> Delete 🗑 </div>
+                                    </div>
+                                </div>`).join("")}
+                        </div>`;
+                        results.innerHTML = html;
+                        attachEditListeners(); // to add edit buttons event listeners
+                        attachDeleteListeners(); // to add delete buttons event listeners
+                    }
+                    else {
+                        console.log(data.message)
+                    }
+                })
+            });
+        }
+    </script>
+</body>
+
+</html>
