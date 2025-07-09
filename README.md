@@ -1,6 +1,6 @@
-# Express Practice
+# Express-practice
 
-This repository contains my **Express.js practice projects**, where I experimented with building server-side applications and APIs.
+This repo contains the practice I did to learn express.js and API routing
 
 ## 🔗 Live Demo
 
